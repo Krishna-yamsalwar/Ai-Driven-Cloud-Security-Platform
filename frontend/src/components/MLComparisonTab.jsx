@@ -28,7 +28,7 @@ const MLComparisonTab = ({ showToast }) => {
     return (
       <div className="dashboard-grid animate-fade-in">
         <div className="panel col-span-12" style={{ textAlign: 'center', padding: '60px' }}>
-          <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--accent-purple)', margin: '0 auto' }} />
+          <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--accent-blue)', margin: '0 auto' }} />
           <p className="mt-4 text-muted">Training and comparing PyOD models...</p>
         </div>
       </div>
@@ -91,7 +91,7 @@ const MLComparisonTab = ({ showToast }) => {
             <BarChart data={chartData}>
               <XAxis dataKey="model" stroke="#8b949e" tick={{ fontSize: 11 }} />
               <YAxis stroke="#8b949e" domain={[0, 100]} tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(20,27,45,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+              <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(23,33,43,0.08)', borderRadius: '12px', color: '#17212b', boxShadow: '0 12px 30px rgba(23,33,43,0.08)' }} />
               <Legend />
               <Bar dataKey="accuracy" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               <Bar dataKey="precision" fill="#8b5cf6" radius={[4, 4, 0, 0]} />

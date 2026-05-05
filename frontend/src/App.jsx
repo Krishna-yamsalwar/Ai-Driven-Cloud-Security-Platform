@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ShieldAlert, Fingerprint, Activity, Server, RefreshCw, AlertTriangle, Zap, FileText, CheckCircle, XCircle, Play, Shield, Download, Lock, Unlock, Settings, BarChart3, ChevronRight, Cpu, Gauge, Crosshair, LogOut, User } from 'lucide-react';
+import { ShieldAlert, Fingerprint, Activity, Server, RefreshCw, AlertTriangle, Zap, FileText, CheckCircle, XCircle, Play, Shield, Download, Lock, Unlock, Settings, BarChart3, ChevronRight, Cpu, Gauge, Crosshair, LogOut, User, Siren, ShieldCheck, TrendingUp, TrendingDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
 import { Badge, ScoreRing, Toast } from './components/SharedComponents';
 import LoginPage from './components/LoginPage';
@@ -95,8 +95,8 @@ const Dashboard = () => {
       <header className="header">
         <h1><ShieldAlert size={32} color="#3b82f6" /> Ram Antivirus — Cloud Security AI</h1>
         <div className="header-stats">
-          <div className="stat-pill"><span style={{ color: 'var(--critical-color)' }}>●</span> {data.summary?.threats.critical} Critical</div>
-          <div className="stat-pill"><span style={{ color: 'var(--high-color)' }}>●</span> {data.summary?.posture.cspm_open_issues} CSPM Issues</div>
+          <div className="stat-pill"><Siren size={14} style={{ color: 'var(--critical-color)' }} /> {data.summary?.threats.critical} Critical</div>
+          <div className="stat-pill"><ShieldCheck size={14} style={{ color: 'var(--high-color)' }} /> {data.summary?.posture.cspm_open_issues} CSPM Issues</div>
           <div className="stat-pill user-pill"><User size={14} /> {user.username} <Badge level={user.role === 'admin' ? 'critical' : user.role === 'analyst' ? 'medium' : 'low'}>{user.role}</Badge></div>
           <button className="btn" onClick={fetchDashboardData} disabled={loading}><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Re-scan</button>
           <button className="btn btn-outline" onClick={handleLogout}><LogOut size={16} /> Logout</button>
@@ -116,7 +116,7 @@ const Dashboard = () => {
               <ResponsiveContainer><AreaChart data={chartData}>
                 <defs><linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient></defs>
                 <XAxis dataKey="time" stroke="#8b949e" tick={{fontSize: 12}} /><YAxis stroke="#8b949e" domain={[0, 1]} tick={{fontSize: 12}} />
-                <Tooltip contentStyle={{ backgroundColor: 'rgba(20,27,45,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(23,33,43,0.08)', borderRadius: '12px', color: '#17212b', boxShadow: '0 12px 30px rgba(23,33,43,0.08)' }} />
                 <Area type="monotone" dataKey="score" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorScore)" />
               </AreaChart></ResponsiveContainer>
             </div>
@@ -223,8 +223,8 @@ const Dashboard = () => {
             {hasPermission('compliance:generate') && <button className="btn btn-success" onClick={fetchComplianceReport}><FileText size={16} /> Generate Report</button>}
             <button className="btn btn-outline" onClick={downloadCSVReport}><Download size={16} /> CSV</button></div></div>
             {complianceDashboard && (<div>
-              <div className="flex items-center gap-4 mb-4" style={{ justifyContent: 'center' }}><ScoreRing score={complianceDashboard.overall_score} size={140} label="Overall Compliance" />
-              <div className="ml-2 flex-col gap-2"><div className="stat-pill">{complianceDashboard.trend?.direction === 'improving' ? <span style={{ color: 'var(--success-color)' }}>↑</span> : <span style={{ color: 'var(--critical-color)' }}>↓</span>}{complianceDashboard.trend?.change_7d > 0 ? '+' : ''}{complianceDashboard.trend?.change_7d}% (7d)</div></div></div>
+            <div className="flex items-center gap-4 mb-4" style={{ justifyContent: 'center' }}><ScoreRing score={complianceDashboard.overall_score} size={140} label="Overall Compliance" />
+              <div className="ml-2 flex-col gap-2"><div className="stat-pill">{complianceDashboard.trend?.direction === 'improving' ? <TrendingUp size={14} style={{ color: 'var(--success-color)' }} /> : <TrendingDown size={14} style={{ color: 'var(--critical-color)' }} />}{complianceDashboard.trend?.change_7d > 0 ? '+' : ''}{complianceDashboard.trend?.change_7d}% (7d)</div></div></div>
               <div className="dashboard-grid" style={{ gap: '16px' }}>{Object.entries(complianceDashboard.frameworks).map(([key, fw]) => (
                 <div key={key} className="framework-card col-span-4" onClick={() => setSelectedFramework(selectedFramework === key ? null : key)} style={{ cursor: 'pointer' }}>
                 <ScoreRing score={fw.score} size={100} label={fw.name} /><Badge level={fw.status}>{fw.status.replace('_', ' ')}</Badge>
@@ -246,7 +246,7 @@ const Dashboard = () => {
           {complianceDashboard && (<div className="panel col-span-6"><h2 className="section-title"><BarChart3 /> Framework Comparison</h2><div style={{ height: '300px' }}>
             <ResponsiveContainer><BarChart data={Object.entries(complianceDashboard.frameworks).map(([key, fw]) => ({ name: key, Passing: fw.passing, Failing: fw.failing }))}>
             <XAxis dataKey="name" stroke="#8b949e" tick={{ fontSize: 12 }} /><YAxis stroke="#8b949e" tick={{ fontSize: 12 }} />
-            <Tooltip contentStyle={{ backgroundColor: 'rgba(20,27,45,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} /><Legend />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(23,33,43,0.08)', borderRadius: '12px', color: '#17212b', boxShadow: '0 12px 30px rgba(23,33,43,0.08)' }} /><Legend />
             <Bar dataKey="Passing" fill="#10b981" radius={[4, 4, 0, 0]} /><Bar dataKey="Failing" fill="#ef4444" radius={[4, 4, 0, 0]} />
             </BarChart></ResponsiveContainer></div></div>)}
           <div className="panel col-span-6"><h2 className="section-title"><FileText /> Report Preview</h2>

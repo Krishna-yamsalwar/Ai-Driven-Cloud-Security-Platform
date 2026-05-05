@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Crosshair, Play, RefreshCw, AlertTriangle, CheckCircle, XCircle, Zap, Target } from 'lucide-react';
+import { Crosshair, Play, RefreshCw, AlertTriangle, CheckCircle, XCircle, Zap, Target, Hammer, ArrowUpRight, Upload, Globe, Sparkles } from 'lucide-react';
 import { Badge } from './SharedComponents';
 
 const API_URL = 'http://localhost:8000/api';
 
 const FALLBACK_SCENARIO_INFO = {
-  brute_force: { icon: '🔨', color: '#ef4444' },
-  privilege_escalation: { icon: '⬆️', color: '#f97316' },
-  data_exfiltration: { icon: '📤', color: '#8b5cf6' },
-  abnormal_access: { icon: '🌐', color: '#06b6d4' },
+  brute_force: { icon: Hammer, color: '#c2410c' },
+  privilege_escalation: { icon: ArrowUpRight, color: '#b45309' },
+  data_exfiltration: { icon: Upload, color: '#0f766e' },
+  abnormal_access: { icon: Globe, color: '#1d4ed8' },
 };
 
 const INTENSITY_OPTIONS = ['low', 'medium', 'high', 'extreme'];
@@ -152,7 +152,13 @@ const AttackSimulationTab = ({ showToast }) => {
               {fullResult.scenarios.map((s, i) => (
                 <div key={i} className="data-item col-span-3">
                   <div className="item-header">
-                    <span className="item-title">{FALLBACK_SCENARIO_INFO[s.scenario]?.icon || '⚡'} {formatLabel(s.scenario)}</span>
+                    <span className="item-title" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      {(() => {
+                        const Icon = FALLBACK_SCENARIO_INFO[s.scenario]?.icon || Sparkles;
+                        return <Icon size={16} style={{ color: FALLBACK_SCENARIO_INFO[s.scenario]?.color || 'var(--text-secondary)' }} />;
+                      })()}
+                      {formatLabel(s.scenario)}
+                    </span>
                     <Badge level={s.expected_detection ? 'completed' : 'fail'}>
                       {s.expected_detection ? 'Expected' : 'Missed'}
                     </Badge>
@@ -172,11 +178,15 @@ const AttackSimulationTab = ({ showToast }) => {
         {loadError && <p className="text-sm" style={{ color: '#ef4444', marginBottom: 12 }}>{loadError}</p>}
         <div className="data-list">
           {scenarios.map((scenario, i) => {
-            const info = FALLBACK_SCENARIO_INFO[scenario.id] || { icon: '⚡', color: '#8b949e' };
+            const info = FALLBACK_SCENARIO_INFO[scenario.id] || { icon: Sparkles, color: 'var(--text-secondary)' };
+            const Icon = info.icon;
             return (
               <div key={i} className="data-item">
                 <div className="item-header">
-                  <span className="item-title">{info.icon} {scenario.title}</span>
+                  <span className="item-title" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <Icon size={16} style={{ color: info.color }} />
+                    {scenario.title}
+                  </span>
                   <button className="btn btn-sm btn-danger" onClick={() => runScenario(scenario.id)} disabled={executing}>
                     {executing && activeScenario === scenario.id ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
                     {executing && activeScenario === scenario.id ? 'Running...' : 'Simulate'}
