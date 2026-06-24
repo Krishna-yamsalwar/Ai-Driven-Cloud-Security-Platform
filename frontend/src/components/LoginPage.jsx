@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ShieldAlert, Lock, User, Mail, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Lock, User, Mail, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { BrandMark } from './SharedComponents';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -56,7 +57,7 @@ const LoginPage = ({ onLogin }) => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <ShieldAlert size={48} color="#3b82f6" />
+          <BrandMark size={250} />
           <h1>Ram Antivirus</h1>
           <p className="text-muted">Cloud Security AI Platform</p>
         </div>

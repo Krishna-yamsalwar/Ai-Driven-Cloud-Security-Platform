@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ShieldAlert, Fingerprint, Activity, Server, RefreshCw, AlertTriangle, Zap, FileText, CheckCircle, XCircle, Play, Shield, Download, Lock, Unlock, Settings, BarChart3, ChevronRight, Cpu, Gauge, Crosshair, LogOut, User, Siren, ShieldCheck, TrendingUp, TrendingDown } from 'lucide-react';
+import { Fingerprint, Activity, Server, RefreshCw, AlertTriangle, Zap, FileText, CheckCircle, XCircle, Play, Shield, Download, Lock, Unlock, Settings, BarChart3, ChevronRight, Cpu, Gauge, Crosshair, LogOut, User, Siren, ShieldCheck, TrendingUp, TrendingDown, Users, Database } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
-import { Badge, ScoreRing, Toast } from './components/SharedComponents';
+import { Badge, BrandMark, MetricCard, ScoreRing, SectionHeader, Toast } from './components/SharedComponents';
 import LoginPage from './components/LoginPage';
 import AttackSimulationTab from './components/AttackSimulationTab';
 import RiskScoreTab from './components/RiskScoreTab';
 import MLComparisonTab from './components/MLComparisonTab';
+import UserManagementTab from './components/UserManagementTab';
 import './index.css';
 
 const API_URL = 'http://localhost:8000/api';
@@ -87,31 +88,64 @@ const Dashboard = () => {
     { id: 'remediation', label: 'Remediation', icon: <Zap size={16} />, perm: 'remediation:read' },
     { id: 'compliance', label: 'Compliance', icon: <FileText size={16} />, perm: 'compliance:read' },
     { id: 'simulation', label: 'Attack Sim', icon: <Crosshair size={16} />, perm: 'simulation:read' },
+    { id: 'users', label: 'Users', icon: <Users size={16} />, perm: 'users:read' },
   ];
   const tabs = allTabs.filter(t => hasPermission(t.perm));
+  const activeTabMeta = tabs.find(t => t.id === activeTab) || tabs[0];
 
   return (
     <div className="app-container">
       <header className="header">
-        <h1><ShieldAlert size={32} color="#3b82f6" /> Ram Antivirus — Cloud Security AI</h1>
+        <div className="brand-lockup">
+          <BrandMark size={64} />
+          <div>
+            <span className="eyebrow">Cloud Security AI</span>
+            <h1>Ram Antivirus</h1>
+          </div>
+        </div>
         <div className="header-stats">
-          <div className="stat-pill"><Siren size={14} style={{ color: 'var(--critical-color)' }} /> {data.summary?.threats.critical} Critical</div>
-          <div className="stat-pill"><ShieldCheck size={14} style={{ color: 'var(--high-color)' }} /> {data.summary?.posture.cspm_open_issues} CSPM Issues</div>
-          <div className="stat-pill user-pill"><User size={14} /> {user.username} <Badge level={user.role === 'admin' ? 'critical' : user.role === 'analyst' ? 'medium' : 'low'}>{user.role}</Badge></div>
+          <div className="user-chip">
+            <User size={16} />
+            <div>
+              <strong>{user.username}</strong>
+              <Badge level={user.role === 'admin' ? 'critical' : user.role === 'analyst' ? 'medium' : 'low'}>{user.role}</Badge>
+            </div>
+          </div>
           <button className="btn" onClick={fetchDashboardData} disabled={loading}><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Re-scan</button>
-          <button className="btn btn-outline" onClick={handleLogout}><LogOut size={16} /> Logout</button>
+          <button className="icon-btn" onClick={handleLogout} title="Logout" aria-label="Logout"><LogOut size={18} /></button>
         </div>
       </header>
 
-      <nav className="tabs-nav">
-        {tabs.map(tab => (<button key={tab.id} className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>{tab.icon} {tab.label}</button>))}
-      </nav>
+      <div className="app-shell">
+        <aside className="sidebar">
+          <nav className="tabs-nav" aria-label="Dashboard sections">
+            {tabs.map(tab => (<button key={tab.id} className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>{tab.icon} <span>{tab.label}</span></button>))}
+          </nav>
+        </aside>
+
+        <main className="content-shell">
+          <div className="page-intro">
+            <div>
+              <span className="eyebrow">Workspace</span>
+              <h2>{activeTabMeta?.label || 'Dashboard'}</h2>
+            </div>
+            <div className="page-actions">
+              <span className="status-dot"></span>
+              <span>Backend connected</span>
+            </div>
+          </div>
 
       {/* OVERVIEW TAB */}
       {activeTab === 'overview' && (
         <div className="dashboard-grid animate-fade-in">
+          <div className="col-span-12 metric-grid">
+            <MetricCard icon={Siren} tone="critical" label="Critical threats" value={data.summary?.threats.critical ?? 0} detail={`${data.summary?.threats.total_analyzed ?? 0} events analyzed`} />
+            <MetricCard icon={AlertTriangle} tone="warning" label="High alerts" value={data.summary?.threats.high ?? 0} detail="ML severity queue" />
+            <MetricCard icon={ShieldCheck} tone="warning" label="CSPM issues" value={data.summary?.posture.cspm_open_issues ?? 0} detail="Open posture findings" />
+            <MetricCard icon={Fingerprint} tone="info" label="CIEM risks" value={data.summary?.posture.ciem_open_risks ?? 0} detail="Identity risk findings" />
+          </div>
           <div className="panel col-span-8">
-            <h2 className="section-title"><Activity /> Real-time PyOD ML Anomaly Detection</h2>
+            <SectionHeader icon={Activity} title="ML Anomaly Trend" subtitle="Recent event anomaly scores from the detection pipeline" />
             <div style={{ height: '300px', width: '100%' }}>
               <ResponsiveContainer><AreaChart data={chartData}>
                 <defs><linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient></defs>
@@ -122,32 +156,32 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="panel col-span-4" style={{ overflowY: 'auto', maxHeight: '400px' }}>
-            <h2 className="section-title text-critical"><AlertTriangle /> Active Threats</h2>
+            <SectionHeader icon={AlertTriangle} title="Active Threats" subtitle="Highest severity findings" />
             <div className="data-list">
               {data.summary?.recent_critical_alerts.map((alert, i) => (
                 <div key={i} className="data-item">
                   <div className="item-header"><span className="item-title">{alert.attack_type?.replace('_', ' ')}</span><Badge level={alert.ml_severity}>{alert.ml_severity}</Badge></div>
                   <div className="text-sm text-muted mb-4">{alert.description}</div>
-                  <div className="flex-between text-xs"><span>User: <strong style={{color: '#f0f6fc'}}>{alert.user}</strong></span><span>IP: {alert.src_ip}</span></div>
+                  <div className="flex-between text-xs"><span>User: <strong>{alert.user}</strong></span><span>IP: {alert.src_ip}</span></div>
                   <div className="score-track mt-4"><div className={`score-fill ${alert.ml_severity.toLowerCase()}`} style={{ width: `${alert.ml_anomaly_score * 100}%` }}></div></div>
                 </div>
               ))}
             </div>
           </div>
           <div className="panel col-span-6">
-            <h2 className="section-title"><Server /> CSPM — Misconfigurations</h2>
+            <SectionHeader icon={Server} title="CSPM Misconfigurations" subtitle="Posture findings derived from logs" />
             <div className="data-list">{data.cspm.map((issue, i) => (
               <div key={i} className="data-item"><div className="item-header"><span className="item-title">{issue.title}</span><Badge level={issue.severity}>{issue.severity}</Badge></div>
               <p className="text-sm text-muted">{issue.description}</p>
-              <div className="mt-4 p-2 text-xs" style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '6px', borderLeft: '3px solid #3b82f6' }}><strong>Remediation:</strong> {issue.remediation}</div></div>
+              <div className="finding-note mt-4"><strong>Remediation:</strong> {issue.remediation}</div></div>
             ))}</div>
           </div>
           <div className="panel col-span-6">
-            <h2 className="section-title"><Fingerprint /> CIEM — Identity Risk</h2>
+            <SectionHeader icon={Fingerprint} title="CIEM Identity Risk" subtitle="Risky identities and access patterns" />
             <div className="data-list">{data.ciem.map((risk, i) => (
               <div key={i} className="data-item"><div className="item-header"><span className="item-title">{risk.title}</span><Badge level={risk.risk_level}>{risk.risk_level}</Badge></div>
               <div className="flex-between text-sm mt-4 mb-4"><span>Entity: <strong>{risk.entity_name}</strong></span><span style={{ color: 'var(--text-secondary)'}}>{risk.entity_type}</span></div>
-              <div className="p-2 text-xs" style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '6px', borderLeft: '3px solid #8b5cf6' }}><strong>Remediation:</strong> {risk.remediation}</div></div>
+              <div className="finding-note"><strong>Remediation:</strong> {risk.remediation}</div></div>
             ))}</div>
           </div>
         </div>
@@ -261,6 +295,11 @@ const Dashboard = () => {
 
       {/* ATTACK SIMULATION TAB */}
       {activeTab === 'simulation' && <AttackSimulationTab showToast={showToast} />}
+
+      {activeTab === 'users' && <UserManagementTab token={token} showToast={showToast} />}
+
+        </main>
+      </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>

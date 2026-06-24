@@ -1,10 +1,41 @@
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
+import logoUrl from '../assets/LOGO.png';
 
 export const Badge = ({ children, level }) => {
   const cn = `badge badge-${(level || 'low').toLowerCase()}`;
   return <span className={cn}>{children}</span>;
 };
+
+export const BrandMark = ({ size = 44, compact = false }) => (
+  <div className="brand-mark" style={{ width: size, height: size }}>
+    <img src={logoUrl} alt={compact ? 'Ram Antivirus logo' : 'Ram Antivirus'} />
+  </div>
+);
+
+export const SectionHeader = ({ icon: Icon, title, subtitle, actions }) => (
+  <div className="section-header">
+    <div className="section-heading">
+      {Icon && <Icon size={18} className="section-heading-icon" />}
+      <div>
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+    </div>
+    {actions && <div className="section-actions">{actions}</div>}
+  </div>
+);
+
+export const MetricCard = ({ icon: Icon, label, value, tone = 'default', detail }) => (
+  <div className={`metric-card metric-${tone}`}>
+    <div className="metric-icon">{Icon && <Icon size={18} />}</div>
+    <div>
+      <span className="metric-label">{label}</span>
+      <strong className="metric-value">{value}</strong>
+      {detail && <span className="metric-detail">{detail}</span>}
+    </div>
+  </div>
+);
 
 export const ScoreRing = ({ score, size = 120, color, label }) => {
   const strokeWidth = 8;
