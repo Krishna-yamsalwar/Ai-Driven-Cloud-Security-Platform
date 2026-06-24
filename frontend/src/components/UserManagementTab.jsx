@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Users, UserCheck, UserX, RefreshCw, Shield, Mail, Clock } from 'lucide-react';
 import { Badge } from './SharedComponents';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const UserManagementTab = ({ token, showToast }) => {
   const [users, setUsers] = useState([]);

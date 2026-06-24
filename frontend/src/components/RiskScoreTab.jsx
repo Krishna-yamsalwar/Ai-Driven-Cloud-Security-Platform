@@ -4,7 +4,7 @@ import { Gauge, RefreshCw, AlertTriangle, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import { Badge, ScoreRing } from './SharedComponents';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const RiskScoreTab = ({ showToast }) => {
   const [risk, setRisk] = useState(null);

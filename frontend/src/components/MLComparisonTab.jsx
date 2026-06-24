@@ -4,7 +4,7 @@ import { Cpu, RefreshCw, Trophy } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { Badge } from './SharedComponents';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const MLComparisonTab = ({ showToast }) => {
   const [comparison, setComparison] = useState(null);

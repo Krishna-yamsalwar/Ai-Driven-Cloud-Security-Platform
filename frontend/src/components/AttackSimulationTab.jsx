@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Crosshair, Play, RefreshCw, AlertTriangle, CheckCircle, XCircle, Zap, Target, Hammer, ArrowUpRight, Upload, Globe, Sparkles } from 'lucide-react';
 import { Badge } from './SharedComponents';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const FALLBACK_SCENARIO_INFO = {
   brute_force: { icon: Hammer, color: '#c2410c' },
