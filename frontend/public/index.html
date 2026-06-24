@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ram Antivirus - Cloud Security AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: #0d0d0d !important;
+            border-bottom: 1px solid #333;
+        }
+        .card {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #fff;
+        }
+        .card-header {
+            background: #111;
+            border-bottom: 1px solid #333;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #fff;
+            color: #000;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #ddd;
+            color: #000;
+        }
+        .btn-outline-light:hover {
+            background: #fff;
+            color: #000;
+        }
+        .badge {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        .table {
+            color: #fff;
+        }
+        .table-dark {
+            --bs-table-bg: #0d0d0d;
+            --bs-table-border-color: #333;
+        }
+        .list-group-item {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: #fff;
+        }
+        .alert {
+            border: 1px solid #333;
+        }
+        .spinner-border {
+            color: #fff;
+        }
+        #loginPage {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage" class="container">
+    <div class="login-card">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>🛡️ Ram Antivirus</h4>
+                <p class="mb-0 text-muted small">Cloud Security AI Platform</p>
+            </div>
+            <div class="card-body">
+                <div id="loginError" class="alert alert-danger d-none"></div>
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="username" placeholder="Username" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <small class="text-muted">Quick Demo:</small><br>
+                    <button class="btn btn-sm btn-outline-light mt-2 me-2" onclick="quickLogin('admin','admin123')">Admin</button>
+                    <button class="btn btn-sm btn-outline-light mt-2 me-2" onclick="quickLogin('analyst1','analyst123')">Analyst</button>
+                    <button class="btn btn-sm btn-outline-light mt-2" onclick="quickLogin('viewer1','viewer123')">Viewer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="d-none">
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">🛡️ Ram Antivirus - Cloud Security AI</span>
+            <div>
+                <span class="badge bg-secondary me-2" id="userBadge"></span>
+                <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Critical Threats</h6>
+                        <h2 id="criticalCount">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">CSPM Issues</h6>
+                        <h2 id="cspmCount">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">CIEM Risks</h6>
+                        <h2 id="ciemCount">-</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Analyzed</h6>
+                        <h2 id="totalCount">-</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" id="mainTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#overview">Overview</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#threats">Active Threats</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#cspm">CSPM</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#ciem">CIEM</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#risk">Risk Score</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>📊 ML Anomaly Detection Events</span>
+                                <button class="btn btn-sm btn-primary" onclick="refreshData()">Refresh</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="eventsLoading" class="text-center py-5">
+                                    <div class="spinner-border" role="status"></div>
+                                    <p class="mt-2">Loading events...</p>
+                                </div>
+                                <div id="eventsTable" class="d-none">
+                                    <table class="table table-dark table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Type</th>
+                                                <th>User</th>
+                                                <th>Source IP</th>
+                                                <th>Service</th>
+                                                <th>ML Score</th>
+                                                <th>Severity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="eventsBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threats Tab -->
+            <div class="tab-pane fade" id="threats">
+                <div class="card">
+                    <div class="card-header">🚨 Active Threats</div>
+                    <div class="card-body">
+                        <div id="threatsLoading" class="text-center py-5">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="threatsList" class="d-none"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSPM Tab -->
+            <div class="tab-pane fade" id="cspm">
+                <div class="card">
+                    <div class="card-header">☁️ CSPM - Cloud Misconfigurations</div>
+                    <div class="card-body">
+                        <div id="cspmLoading" class="text-center py-5">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="cspmList" class="d-none"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CIEM Tab -->
+            <div class="tab-pane fade" id="ciem">
+                <div class="card">
+                    <div class="card-header">🔐 CIEM - Identity Risks</div>
+                    <div class="card-body">
+                        <div id="ciemLoading" class="text-center py-5">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="ciemList" class="d-none"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Score Tab -->
+            <div class="tab-pane fade" id="risk">
+                <div class="card">
+                    <div class="card-header">⚠️ Unified Risk Score</div>
+                    <div class="card-body">
+                        <div id="riskLoading" class="text-center py-5">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="riskContent" class="d-none text-center">
+                            <h1 id="riskScore" class="display-1">-</h1>
+                            <p id="riskLevel" class="lead"></p>
+                            <hr>
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <h6 class="text-muted">ML Detection</h6>
+                                    <h3 id="mlScore">-</h3>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-muted">CSPM Posture</h6>
+                                    <h3 id="cspmScore">-</h3>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-muted">CIEM Identity</h6>
+                                    <h3 id="ciemScore">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API_URL = 'http://localhost:8000/api';
+let token = null;
+let user = null;
+
+// Login
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    await login(username, password);
+});
+
+function quickLogin(username, password) {
+    document.getElementById('username').value = username;
+    document.getElementById('password').value = password;
+    login(username, password);
+}
+
+async function login(username, password) {
+    try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            token = data.data.token;
+            user = data.data.user;
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            showDashboard();
+        } else {
+            showError(data.detail || 'Login failed');
+        }
+    } catch (err) {
+        showError('Connection error');
+    }
+}
+
+function showError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg;
+    el.classList.remove('d-none');
+}
+
+function logout() {
+    token = null;
+    user = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    document.getElementById('loginPage').classList.remove('d-none');
+    document.getElementById('dashboard').classList.add('d-none');
+}
+
+function showDashboard() {
+    document.getElementById('loginPage').classList.add('d-none');
+    document.getElementById('dashboard').classList.remove('d-none');
+    document.getElementById('userBadge').textContent = `${user.username} (${user.role})`;
+    refreshData();
+}
+
+// Load data
+async function refreshData() {
+    loadSummary();
+    loadEvents();
+    loadThreats();
+    loadCSPM();
+    loadCIEM();
+    loadRisk();
+}
+
+async function loadSummary() {
+    try {
+        const res = await fetch(`${API_URL}/dashboard/summary`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            document.getElementById('criticalCount').textContent = data.data.threats.critical;
+            document.getElementById('cspmCount').textContent = data.data.posture.cspm_open_issues;
+            document.getElementById('ciemCount').textContent = data.data.posture.ciem_open_risks;
+            document.getElementById('totalCount').textContent = data.data.threats.total_analyzed;
+        }
+    } catch (err) {
+        console.error('Summary error:', err);
+    }
+}
+
+async function loadEvents() {
+    try {
+        const res = await fetch(`${API_URL}/simulate/events?normal=50&attacks=10`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            const tbody = document.getElementById('eventsBody');
+            tbody.innerHTML = '';
+            data.data.slice(0, 20).forEach(e => {
+                const tr = document.createElement('tr');
+                const time = new Date(e.timestamp).toLocaleTimeString();
+                const severityBadge = getSeverityBadge(e.ml_severity);
+                tr.innerHTML = `
+                    <td>${time}</td>
+                    <td>${e.attack_type || e.event_type}</td>
+                    <td>${e.user}</td>
+                    <td>${e.src_ip}</td>
+                    <td>${e.service}</td>
+                    <td>${(e.ml_anomaly_score * 100).toFixed(1)}%</td>
+                    <td>${severityBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('eventsLoading').classList.add('d-none');
+            document.getElementById('eventsTable').classList.remove('d-none');
+        }
+    } catch (err) {
+        console.error('Events error:', err);
+    }
+}
+
+async function loadThreats() {
+    try {
+        const res = await fetch(`${API_URL}/dashboard/summary`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            const list = document.getElementById('threatsList');
+            list.innerHTML = '';
+            if (data.data.recent_critical_alerts.length === 0) {
+                list.innerHTML = '<p class="text-muted">No critical threats detected</p>';
+            } else {
+                data.data.recent_critical_alerts.forEach(alert => {
+                    const div = document.createElement('div');
+                    div.className = 'list-group-item mb-2';
+                    div.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <strong>${alert.attack_type || alert.event_type}</strong>
+                            ${getSeverityBadge(alert.ml_severity)}
+                        </div>
+                        <p class="mb-1 small">${alert.description}</p>
+                        <small class="text-muted">User: ${alert.user} | IP: ${alert.src_ip}</small>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            document.getElementById('threatsLoading').classList.add('d-none');
+            list.classList.remove('d-none');
+        }
+    } catch (err) {
+        console.error('Threats error:', err);
+    }
+}
+
+async function loadCSPM() {
+    try {
+        const res = await fetch(`${API_URL}/cspm/scan`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            const list = document.getElementById('cspmList');
+            list.innerHTML = '';
+            if (data.data.length === 0) {
+                list.innerHTML = '<p class="text-muted">No CSPM issues found</p>';
+            } else {
+                data.data.forEach(issue => {
+                    const div = document.createElement('div');
+                    div.className = 'list-group-item mb-2';
+                    div.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <strong>${issue.title}</strong>
+                            ${getSeverityBadge(issue.severity)}
+                        </div>
+                        <p class="mb-1 small">${issue.description}</p>
+                        <small class="text-muted">Resource: ${issue.resource}</small>
+                        <div class="mt-2 p-2 bg-dark border border-secondary rounded">
+                            <small><strong>Remediation:</strong> ${issue.remediation}</small>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            document.getElementById('cspmLoading').classList.add('d-none');
+            list.classList.remove('d-none');
+        }
+    } catch (err) {
+        console.error('CSPM error:', err);
+    }
+}
+
+async function loadCIEM() {
+    try {
+        const res = await fetch(`${API_URL}/ciem/scan`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            const list = document.getElementById('ciemList');
+            list.innerHTML = '';
+            if (data.data.length === 0) {
+                list.innerHTML = '<p class="text-muted">No CIEM risks found</p>';
+            } else {
+                data.data.forEach(risk => {
+                    const div = document.createElement('div');
+                    div.className = 'list-group-item mb-2';
+                    div.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <strong>${risk.title}</strong>
+                            ${getSeverityBadge(risk.risk_level)}
+                        </div>
+                        <p class="mb-1 small">${risk.description}</p>
+                        <small class="text-muted">Entity: ${risk.entity_name} (${risk.entity_type})</small>
+                        <div class="mt-2 p-2 bg-dark border border-secondary rounded">
+                            <small><strong>Remediation:</strong> ${risk.remediation}</small>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            document.getElementById('ciemLoading').classList.add('d-none');
+            list.classList.remove('d-none');
+        }
+    } catch (err) {
+        console.error('CIEM error:', err);
+    }
+}
+
+async function loadRisk() {
+    try {
+        const res = await fetch(`${API_URL}/risk/score`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            const risk = data.data;
+            document.getElementById('riskScore').textContent = risk.unified_risk_score;
+            document.getElementById('riskLevel').textContent = risk.unified_risk_level.toUpperCase();
+            document.getElementById('mlScore').textContent = risk.components.ml_anomaly_detection.score;
+            document.getElementById('cspmScore').textContent = risk.components.cspm_posture.score;
+            document.getElementById('ciemScore').textContent = risk.components.ciem_identity.score;
+            document.getElementById('riskLoading').classList.add('d-none');
+            document.getElementById('riskContent').classList.remove('d-none');
+        }
+    } catch (err) {
+        console.error('Risk error:', err);
+    }
+}
+
+function getSeverityBadge(severity) {
+    const s = (severity || 'low').toLowerCase();
+    let cls = 'secondary';
+    if (s === 'critical') cls = 'danger';
+    else if (s === 'high') cls = 'warning';
+    else if (s === 'medium') cls = 'info';
+    return `<span class="badge bg-${cls}">${severity}</span>`;
+}
+
+// Check for saved session
+window.addEventListener('DOMContentLoaded', () => {
+    const savedToken = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+    if (savedToken && savedUser) {
+        token = savedToken;
+        user = JSON.parse(savedUser);
+        showDashboard();
+    }
+});
+</script>
+
+</body>
+</html>
